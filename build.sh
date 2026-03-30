@@ -10,4 +10,4 @@ nltk.download('averaged_perceptron_tagger_eng')
 nltk.download('wordnet')
 nltk.download('brown')
 "
-python -c "import textblob; textblob.download_corpora.download_all()"
+python -m textblob.download_corpora
