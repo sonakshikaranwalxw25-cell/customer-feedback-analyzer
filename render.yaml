@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: customer-feedback-analyzer
+    runtime: python
+    buildCommand: chmod +x build.sh && ./build.sh
+    startCommand: gunicorn app:app
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.6
+      - key: ANTHROPIC_API_KEY
+        sync: false

@@ -1,0 +1,5 @@
+flask==3.0.0
+textblob==0.18.0
+nltk==3.9.1
+requests==2.31.0
+gunicorn==21.2.0

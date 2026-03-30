@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Customer Feedback Analyzer | MRP-1 Project</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0f172a;
+            color: #e2e8f0;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border-bottom: 1px solid #1e293b;
+            padding: 20px 0;
+        }
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+        .logo-text h1 {
+            font-size: 18px;
+            font-weight: 700;
+            color: #f1f5f9;
+        }
+        .logo-text p {
+            font-size: 11px;
+            color: #94a3b8;
+            letter-spacing: 0.5px;
+        }
+        .header-badge {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 20px;
+            padding: 6px 14px;
+            font-size: 11px;
+            color: #94a3b8;
+        }
+
+        /* Main */
+        .main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 32px 24px;
+        }
+
+        /* Input Section */
+        .input-section {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 16px;
+            padding: 28px;
+            margin-bottom: 28px;
+        }
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: #f1f5f9;
+        }
+        .section-subtitle {
+            font-size: 13px;
+            color: #94a3b8;
+            margin-bottom: 18px;
+        }
+        textarea {
+            width: 100%;
+            min-height: 160px;
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 10px;
+            padding: 16px;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            color: #e2e8f0;
+            resize: vertical;
+            outline: none;
+            transition: border-color 0.2s;
+            line-height: 1.6;
+        }
+        textarea:focus {
+            border-color: #6366f1;
+        }
+        textarea::placeholder {
+            color: #4b5563;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 16px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .sample-buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .sample-btn {
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            padding: 7px 14px;
+            font-size: 12px;
+            color: #94a3b8;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'Inter', sans-serif;
+        }
+        .sample-btn:hover {
+            border-color: #6366f1;
+            color: #c7d2fe;
+            background: #1e1b4b;
+        }
+        .analyze-btn {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            border: none;
+            border-radius: 10px;
+            padding: 12px 32px;
+            font-size: 14px;
+            font-weight: 600;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'Inter', sans-serif;
+        }
+        .analyze-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4);
+        }
+        .analyze-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Loading */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 48px;
+        }
+        .spinner {
+            width: 44px;
+            height: 44px;
+            border: 3px solid #334155;
+            border-top-color: #6366f1;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 16px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .loading p {
+            color: #94a3b8;
+            font-size: 14px;
+        }
+
+        /* Results */
+        .results {
+            display: none;
+        }
+
+        /* Stats Bar */
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+        .stat-card {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #f1f5f9;
+        }
+        .stat-label {
+            font-size: 11px;
+            color: #64748b;
+            margin-top: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Result Panels */
+        .panels {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+        .panel {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 16px;
+            padding: 24px;
+        }
+        .panel-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #f1f5f9;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .panel-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+
+        /* Sentiment Display */
+        .sentiment-main {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 20px;
+            padding: 16px;
+            background: #0f172a;
+            border-radius: 12px;
+        }
+        .sentiment-emoji {
+            font-size: 42px;
+        }
+        .sentiment-info h3 {
+            font-size: 20px;
+            font-weight: 700;
+        }
+        .sentiment-info p {
+            font-size: 12px;
+            color: #94a3b8;
+            margin-top: 2px;
+        }
+        
+        .meter-container {
+            margin-bottom: 16px;
+        }
+        .meter-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #94a3b8;
+            margin-bottom: 6px;
+        }
+        .meter {
+            height: 8px;
+            background: #0f172a;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .meter-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.6s ease;
+        }
+
+        /* Sentence Breakdown */
+        .sentence-list {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .sentence-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid #1e293b;
+            font-size: 13px;
+        }
+        .sentence-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            margin-top: 5px;
+        }
+        .sentence-text {
+            color: #cbd5e1;
+            line-height: 1.5;
+        }
+
+        /* Topics */
+        .topic-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+        .topic-tag {
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 20px;
+            padding: 6px 14px;
+            font-size: 13px;
+            color: #c7d2fe;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .topic-count {
+            background: #6366f1;
+            color: white;
+            font-size: 10px;
+            padding: 1px 6px;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+
+        .phrases-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .phrase-tag {
+            background: #1e1b4b;
+            border: 1px solid #4338ca;
+            border-radius: 8px;
+            padding: 6px 12px;
+            font-size: 12px;
+            color: #a5b4fc;
+        }
+
+        /* Recommendations */
+        .recs-section {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 16px;
+            padding: 24px;
+        }
+        .recs-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .recs-source {
+            font-size: 11px;
+            color: #64748b;
+            background: #0f172a;
+            padding: 4px 10px;
+            border-radius: 6px;
+        }
+        .rec-card {
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 12px;
+            border-left: 4px solid;
+        }
+        .rec-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+        .rec-priority {
+            font-size: 10px;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .rec-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #f1f5f9;
+        }
+        .rec-desc {
+            font-size: 13px;
+            color: #94a3b8;
+            margin-bottom: 12px;
+            line-height: 1.5;
+        }
+        .rec-actions {
+            list-style: none;
+        }
+        .rec-actions li {
+            font-size: 13px;
+            color: #cbd5e1;
+            padding: 4px 0;
+            padding-left: 20px;
+            position: relative;
+            line-height: 1.5;
+        }
+        .rec-actions li::before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: #6366f1;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 32px;
+            color: #475569;
+            font-size: 12px;
+            border-top: 1px solid #1e293b;
+            margin-top: 40px;
+        }
+        .footer a {
+            color: #6366f1;
+            text-decoration: none;
+        }
+
+        /* Error */
+        .error-msg {
+            display: none;
+            background: #451a1a;
+            border: 1px solid #dc2626;
+            border-radius: 10px;
+            padding: 14px 20px;
+            margin-bottom: 20px;
+            color: #fca5a5;
+            font-size: 14px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .stats-bar { grid-template-columns: repeat(2, 1fr); }
+            .panels { grid-template-columns: 1fr; }
+            .controls { flex-direction: column; align-items: stretch; }
+            .sample-buttons { justify-content: center; }
+            .analyze-btn { width: 100%; }
+            .header-badge { display: none; }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <div class="logo">
+                <div class="logo-icon">🔍</div>
+                <div class="logo-text">
+                    <h1>Customer Feedback Analyzer</h1>
+                    <p>AI-POWERED NLP DECISION SUPPORT SYSTEM</p>
+                </div>
+            </div>
+            <div class="header-badge">MRP-1 | IIM Ranchi | EMBA 2025-27</div>
+        </div>
+    </div>
+
+    <div class="main">
+        <!-- Input -->
+        <div class="input-section">
+            <div class="section-title">Analyze Customer Feedback</div>
+            <div class="section-subtitle">Paste customer reviews, support tickets, survey responses, or social media comments below</div>
+            <textarea id="feedbackInput" placeholder="Example: The analytics dashboard has great visualizations but the loading time is extremely frustrating. The export feature crashes frequently and the mobile experience needs improvement..."></textarea>
+            <div class="controls">
+                <div class="sample-buttons" id="sampleButtons">
+                    <span style="font-size: 12px; color: #64748b; align-self: center;">Try samples:</span>
+                </div>
+                <button class="analyze-btn" id="analyzeBtn" onclick="analyzeFeedback()">
+                    ✨ Analyze Feedback
+                </button>
+            </div>
+        </div>
+
+        <!-- Error -->
+        <div class="error-msg" id="errorMsg"></div>
+
+        <!-- Loading -->
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Running NLP pipeline — analyzing sentiment, extracting topics...</p>
+        </div>
+
+        <!-- Results -->
+        <div class="results" id="results">
+            <!-- Stats Bar -->
+            <div class="stats-bar" id="statsBar"></div>
+
+            <!-- Panels -->
+            <div class="panels">
+                <!-- Sentiment Panel -->
+                <div class="panel">
+                    <div class="panel-title">
+                        <div class="panel-icon" style="background: #312e81;">📊</div>
+                        Sentiment Analysis
+                    </div>
+                    <div id="sentimentContent"></div>
+                </div>
+
+                <!-- Topics Panel -->
+                <div class="panel">
+                    <div class="panel-title">
+                        <div class="panel-icon" style="background: #1e1b4b;">🏷️</div>
+                        Topic Extraction
+                    </div>
+                    <div id="topicsContent"></div>
+                </div>
+            </div>
+
+            <!-- Sentence Breakdown -->
+            <div class="panel" style="margin-bottom: 24px;">
+                <div class="panel-title">
+                    <div class="panel-icon" style="background: #1c1917;">📝</div>
+                    Sentence-Level Sentiment Breakdown
+                </div>
+                <div class="sentence-list" id="sentenceList"></div>
+            </div>
+
+            <!-- Recommendations -->
+            <div class="recs-section">
+                <div class="recs-header">
+                    <div class="panel-title" style="margin-bottom: 0;">
+                        <div class="panel-icon" style="background: #14532d;">💡</div>
+                        Product Recommendations
+                    </div>
+                    <div class="recs-source" id="recSource"></div>
+                </div>
+                <div id="recsContent"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p><strong>Customer Feedback Analyzer</strong> — AI-Powered NLP Decision Support System</p>
+        <p style="margin-top: 6px;">Major Research Project - 1 | Sonakshi Karanwal (XW035-25) | IIM Ranchi EMBA 2025-27</p>
+        <p style="margin-top: 6px;">Supervised by <strong>Prof. Shibashish Chakraborty</strong></p>
+        <p style="margin-top: 12px; color: #334155;">Built with Flask, TextBlob, NLTK, and Claude AI</p>
+    </div>
+
+    <script>
+        // Load samples on page load
+        window.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const res = await fetch('/sample');
+                const samples = await res.json();
+                const container = document.getElementById('sampleButtons');
+                samples.forEach((s, i) => {
+                    const btn = document.createElement('button');
+                    btn.className = 'sample-btn';
+                    btn.textContent = s.title;
+                    btn.onclick = () => {
+                        document.getElementById('feedbackInput').value = s.text;
+                    };
+                    container.appendChild(btn);
+                });
+            } catch(e) {
+                console.error('Failed to load samples:', e);
+            }
+        });
+
+        async function analyzeFeedback() {
+            const text = document.getElementById('feedbackInput').value.trim();
+            const btn = document.getElementById('analyzeBtn');
+            const loading = document.getElementById('loading');
+            const results = document.getElementById('results');
+            const error = document.getElementById('errorMsg');
+            
+            error.style.display = 'none';
+            results.style.display = 'none';
+            
+            if (!text) {
+                error.textContent = 'Please enter some customer feedback to analyze.';
+                error.style.display = 'block';
+                return;
+            }
+            
+            btn.disabled = true;
+            btn.textContent = '⏳ Analyzing...';
+            loading.style.display = 'block';
+            
+            try {
+                const res = await fetch('/analyze', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ feedback: text })
+                });
+                
+                const data = await res.json();
+                
+                if (data.error) {
+                    error.textContent = data.error;
+                    error.style.display = 'block';
+                    return;
+                }
+                
+                renderResults(data);
+                results.style.display = 'block';
+                results.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                
+            } catch(e) {
+                error.textContent = 'Analysis failed. Please try again.';
+                error.style.display = 'block';
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '✨ Analyze Feedback';
+                loading.style.display = 'none';
+            }
+        }
+
+        function renderResults(data) {
+            const { sentiment, topics, key_phrases, recommendations, recommendation_source, stats } = data;
+            
+            // Stats bar
+            document.getElementById('statsBar').innerHTML = `
+                <div class="stat-card">
+                    <div class="stat-value">${stats.word_count}</div>
+                    <div class="stat-label">Words Analyzed</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${stats.sentence_count}</div>
+                    <div class="stat-label">Sentences</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${stats.topics_found}</div>
+                    <div class="stat-label">Topics Found</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${recommendations.length}</div>
+                    <div class="stat-label">Recommendations</div>
+                </div>
+            `;
+            
+            // Sentiment
+            document.getElementById('sentimentContent').innerHTML = `
+                <div class="sentiment-main">
+                    <div class="sentiment-emoji">${sentiment.sentiment_emoji}</div>
+                    <div class="sentiment-info">
+                        <h3 style="color: ${sentiment.sentiment_color}">${sentiment.sentiment_label}</h3>
+                        <p>${sentiment.subjectivity_label}</p>
+                    </div>
+                </div>
+                <div class="meter-container">
+                    <div class="meter-label">
+                        <span>Negative (-1)</span>
+                        <span>Polarity: ${sentiment.polarity}</span>
+                        <span>Positive (+1)</span>
+                    </div>
+                    <div class="meter">
+                        <div class="meter-fill" style="width: ${sentiment.polarity_percentage}%; background: ${sentiment.sentiment_color};"></div>
+                    </div>
+                </div>
+                <div class="meter-container">
+                    <div class="meter-label">
+                        <span>Objective (0)</span>
+                        <span>Subjectivity: ${sentiment.subjectivity}</span>
+                        <span>Subjective (1)</span>
+                    </div>
+                    <div class="meter">
+                        <div class="meter-fill" style="width: ${sentiment.subjectivity * 100}%; background: #8b5cf6;"></div>
+                    </div>
+                </div>
+            `;
+            
+            // Topics
+            let topicsHTML = '<div class="topic-tags">';
+            topics.forEach(t => {
+                topicsHTML += `<div class="topic-tag">${t.topic} <span class="topic-count">${t.count}</span></div>`;
+            });
+            topicsHTML += '</div>';
+            
+            if (key_phrases.length > 0) {
+                topicsHTML += '<div style="font-size: 12px; color: #64748b; margin-bottom: 8px; margin-top: 12px;">Key Phrases:</div>';
+                topicsHTML += '<div class="phrases-list">';
+                key_phrases.forEach(p => {
+                    topicsHTML += `<div class="phrase-tag">"${p.phrase}" (${p.count}×)</div>`;
+                });
+                topicsHTML += '</div>';
+            }
+            document.getElementById('topicsContent').innerHTML = topicsHTML;
+            
+            // Sentence breakdown
+            let sentHTML = '';
+            sentiment.sentence_sentiments.forEach(s => {
+                sentHTML += `
+                    <div class="sentence-item">
+                        <div class="sentence-dot" style="background: ${s.color}"></div>
+                        <div>
+                            <span class="sentence-text">${s.text}</span>
+                            <span style="font-size: 11px; color: ${s.color}; margin-left: 6px;">${s.label} (${s.polarity})</span>
+                        </div>
+                    </div>
+                `;
+            });
+            document.getElementById('sentenceList').innerHTML = sentHTML;
+            
+            // Recommendations
+            document.getElementById('recSource').textContent = `Source: ${recommendation_source}`;
+            
+            let recsHTML = '';
+            recommendations.forEach(r => {
+                const bgColor = r.priority === 'High' ? '#2d1b1b' : r.priority === 'Medium' ? '#2d2417' : '#1b2d1e';
+                recsHTML += `
+                    <div class="rec-card" style="border-left-color: ${r.priority_color}; background: ${bgColor};">
+                        <div class="rec-header">
+                            <span class="rec-priority" style="background: ${r.priority_color}20; color: ${r.priority_color};">${r.priority} Priority</span>
+                            <span class="rec-title">${r.title}</span>
+                        </div>
+                        <div class="rec-desc">${r.description}</div>
+                        <ul class="rec-actions">
+                            ${r.actions.map(a => `<li>${a}</li>`).join('')}
+                        </ul>
+                    </div>
+                `;
+            });
+            document.getElementById('recsContent').innerHTML = recsHTML;
+        }
+    </script>
+</body>
+</html>
