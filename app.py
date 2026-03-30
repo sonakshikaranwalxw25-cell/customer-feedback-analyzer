@@ -16,6 +16,9 @@ nltk.download('stopwords', quiet=True)
 nltk.download('averaged_perceptron_tagger', quiet=True)
 nltk.download('averaged_perceptron_tagger_eng', quiet=True)
 nltk.download('wordnet', quiet=True)
+nltk.download('brown', quiet=True)
+nltk.download('conll2000', quiet=True)
+nltk.download('movie_reviews', quiet=True)
 
 app = Flask(__name__)
 
